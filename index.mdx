@@ -1,57 +1,99 @@
 ---
-title: "About Codewolf"
-description: "AI agents for production"
+title: "About Codewolf AI"
+description: "Codewolf is a system of autonomous AI agents that run day-to-day production engineering work directly from Slack. As teams ship continuously, production work often still depends on humans reacting to alerts, digging through dashboards, and coordinating fixes by hand. Codewolf acts as an always-on production teammate that removes this operational burden. The agents continuously observe your systems, maintain deep operational context, and take action when needed: investigating incidents, applying fixes through pull requests and configuration changes, detecting issues early, and surfacing clear reports. Codewolf doesn't replace engineers. It reduces operational noise, allowing humans to focus on design, architecture, and building products while production work progresses automatically with full visibility and control."
 ---
-
-## What is Codewolf?
-
-Codewolf provides AI agents that work directly in Slack to handle production engineering tasks. Tag <span style={{color: '#07C983'}}>@Codewolf</span> and agents investigate incidents, optimize costs, and help you ship faster with production context.
 
 ## Key features
 
-<AccordionGroup>
+<Tabs>
+<Tab title="Investigate">
+Tag <span style={{color: '#07C983'}}>@Codewolf</span> in Slack when issues strike. AI agents analyze deployments, correlate logs across services, trace requests, and identify root causes. From alert to diagnosis in minutes.
 
-<Accordion title="Investigate" defaultOpen>
-  Respond to incidents from alerts, customer tickets, and production issues. Get root causes with evidence.
+**Slack mentions:**
+- @Codewolf payment API is throwing 500 errors, customers can't checkout
+- @Codewolf investigate this PagerDuty alert - database latency spiking
+- @Codewolf trace this request ID through our services
 
-  **Examples:**
-  - "@Codewolf payment API is throwing 500 errors"
-  - "Investigate spike in database latency from PagerDuty alert"
-  - "Customer reports checkout failures, find the cause"
-</Accordion>
+**Triggers:**
+- Alert: High error rate detected in checkout service
+- Webhook: Customer support ticket for checkout failures
+- Incident channel created: Site down - payment service unreachable
+</Tab>
 
-<Accordion title="Fix">
-  Receive automated fixes as pull requests, code snippets, and remediation steps after investigation or optimization.
+<Tab title="Fix">
+AI agents don't just find problems, they fix them. With full production context and live telemetry, agents generate robust PRs with code patches and configuration changes that resolve issues fast and correctly.
 
-  **Examples:**
-  - Pull request with connection pool size increase to fix database timeouts
-  - Code snippet to add missing error handling for API calls
-  - Step-by-step remediation plan for security vulnerability
-</Accordion>
+**Slack mentions:**
+- @Codewolf create a PR to fix the connection pool exhaustion
+- @Codewolf fix the memory leak in auth service
 
-<Accordion title="Prevent">
-  Review PRs for risks before deployment. Get daily reports on potential issues before they impact production.
+**Triggers:**
+- Post-investigation: Automatically generate PR with fix
+- Alert resolution: Apply configuration change to resolve issue
+</Tab>
 
-  **Examples:**
-  - "PR #412 introduces a potential memory leak in auth service"
-  - Daily 9am report: "3 services have missing error handlers"
-  - "Deployment to staging detected N+1 query issue"
-</Accordion>
+<Tab title="Prevent">
+Catch issues before they reach production. AI agents review PRs for risks, run post-deployment checks, detect anomalies in metrics, and flag suspicious patterns. Stop problems before they become incidents.
 
-<Accordion title="Optimize">
-  Receive scheduled reports on system performance and cost savings. Implement optimizations continuously and automatically.
+**Slack mentions:**
+- @Codewolf review this PR for production risks
 
-  **Examples:**
-  - Weekly report: "Reduce AWS costs by 23% by rightsizing EC2 instances"
-  - "Detected unused Redis cache, automatic cleanup saved $450/month"
-  - "Database query optimization reduced latency by 40%"
-</Accordion>
+**Triggers:**
+- GitHub PR opened: Warning - PR #412 introduces potential memory leak
+- GitHub deployment: Analyze errors after deploy #1234
+- Post-deployment: Detected N+1 query issue in staging
 
-</AccordionGroup>
+**Schedules:**
+- Daily 9am report: 3 services missing error handlers, 2 deprecated APIs in use
+</Tab>
+
+<Tab title="Optimize">
+Continuously improve your infrastructure. AI agents analyze costs, identify resource waste, recommend performance improvements, and track efficiency trends. Get daily insights without manual analysis.
+
+**Slack mentions:**
+- @Codewolf analyze our infrastructure costs and find savings
+
+**Triggers:**
+- Cost spike detected: Investigate unusual AWS spending increase
+
+**Schedules:**
+- Weekly Monday report: Reduce AWS costs by 23% by rightsizing 12 EC2 instances
+- Daily 9am report: Query optimization opportunities in payment service
+</Tab>
+
+<Tab title="Learn">
+Codewolf AI agents understand your entire system. Not just your codebase, but production behavior, infrastructure, service dependencies, deployment patterns, and system relationships. This deep context enables smarter investigations, better fixes, and proactive prevention.
+
+**Slack mentions:**
+- @Codewolf explain how the payment service connects to Stripe
+- @Codewolf what services depend on the auth API
+- @Codewolf show me similar incidents we've had with database connections
+
+**Codebase & Architecture:**
+- Code structure, patterns, and architectural decisions
+- Monorepo organization and cross-service dependencies
+- Shared libraries and common utilities
+
+**Production & Runtime:**
+- Production behavior and runtime characteristics
+- Performance patterns and resource usage
+- Error rates and failure modes
+
+**Infrastructure & Topology:**
+- Service dependencies and data flow relationships
+- Deployment patterns and infrastructure topology
+- Network topology and API contracts
+
+**Knowledge & History:**
+- Historical incidents and resolution strategies
+- Team knowledge from Slack conversations
+- Documentation and runbooks
+</Tab>
+</Tabs>
 
 ## How Codewolf agents work
 
-Codewolf connects to your production systems, continuously learns from your code, infrastructure, and operations, then deploys specialized AI agents to handle engineering tasks autonomously.
+Codewolf connects to your systems and continuously learns, then deploys specialized AI agents to handle engineering tasks autonomously.
 
 <Steps>
 <Step title="Generate context and update">
@@ -139,9 +181,9 @@ graph LR
 Every customer gets their own isolated Private Agent Sandbox with:
 
 **Isolated infrastructure:**
-- Dedicated compute resources per customer
-- Isolated file storage - your data never touches other customers
-- Isolated database - complete data separation
+- Dedicated agent compute resources per customer
+- Isolated agent file storage - your data never touches other customers
+- Isolated agent database - complete data separation
 
 **Enterprise security:**
 - AES-256 encryption in transit and at rest
