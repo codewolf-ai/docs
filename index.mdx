@@ -9,17 +9,125 @@ Codewolf provides AI agents that work directly in Slack to handle production eng
 
 ## Key features
 
-**Investigate incidents**
-AI agents analyze your code, infrastructure, and telemetry to find root causes and deliver fixes with pull requests.
+<CardGroup cols={2}>
 
-**Monitor continuously**
-Agents watch for issues, review PRs, run post-deployment checks, and catch problems before they escalate.
+<Card title="Investigate">
+  Respond to incidents from alerts, customer tickets, and production issues. Get root causes with evidence.
+</Card>
 
-**Automate workflows**
-Set up scheduled tasks like daily summaries, weekly reports, and automated ticket creation.
+<Card title="Fix">
+  Receive automated fixes as pull requests, code snippets, and remediation steps after investigation or optimization.
+</Card>
 
-**Optimize costs**
-Discover savings opportunities across your infrastructure and services.
+<Card title="Prevent">
+  Review PRs for risks before deployment. Get daily reports on potential issues before they impact production.
+</Card>
+
+<Card title="Optimize">
+  Receive scheduled reports on system performance and cost savings. Implement optimizations continuously and automatically.
+</Card>
+
+</CardGroup>
+
+## How Codewolf agents work
+
+Codewolf ingests events from alerts, @mentions, schedules, and webhooks, then generates context for AI agents using your integrations and event metadata.
+
+### Investigate and fix
+When issues strike, tag <span style={{color: '#07C983'}}>@Codewolf</span> in Slack. A fleet of AI agents analyzes deployments, correlates logs, triages severity, and delivers fixes with PRs. From investigation to resolution in minutes.
+
+### Act on events
+AI agents monitor continuously and act immediately on events. Review PRs for risks, run post-deployment checks, detect anomalies, catch bugs early, flag potential issues - stopping problems before they bite.
+
+### Run on schedules
+Set it and forget it. Daily incident summaries at 9am, weekly cost reports, recurring deployment reviews, automated ticket creation - AI agents work while you sleep, so you're always informed without lifting a finger.
+
+### Agent architecture
+
+**Agent Sandbox Environment includes:**
+- Isolated compute resources
+- Isolated file storage
+- Isolated database
+
+```mermaid
+graph LR
+    subgraph Triggers["Triggers"]
+        T1[@Codewolf]:::trigger
+        T2[Alerts]:::trigger
+        T3[Cron Jobs]:::trigger
+        T4[Github Events]:::trigger
+        T5[Webhooks]:::trigger
+        T6[Emails]:::trigger
+        T1 ~~~ T2 ~~~ T3 ~~~ T4 ~~~ T5 ~~~ T6
+    end
+
+    subgraph Sandbox["Agent Sandbox Environment"]
+        subgraph Coordinator["Coordinator"]
+            CoordinatorAgent[Coordinator Agent]:::coordinator
+        end
+
+        subgraph Context["Context"]
+            Eval[Evals Agent]:::evals
+            ContextAgent[Context Agent]:::context
+        end
+
+        subgraph Workers["Workers"]
+            W1[Agent 1]:::worker
+            W2[Agent 2]:::worker
+            W3[Agent 3]:::worker
+            W4[Agent 4]:::worker
+            W5[Agent 5]:::worker
+            W6[Agent 6]:::worker
+            W7[Agent N]:::worker
+            W1 ~~~ W2 ~~~ W3 ~~~ W4 ~~~ W5 ~~~ W6 ~~~ W7
+        end
+    end
+
+    subgraph Integrations["Integrations"]
+        I1[Slack]:::integration
+        I2[GitHub]:::integration
+        I3[Datadog]:::integration
+        I4[Sentry]:::integration
+        I5[Grafana]:::integration
+        I6[AWS]:::integration
+        I7[Kubernetes]:::integration
+        I8[Notion]:::integration
+        I9[Linear]:::integration
+        I10[PostHog]:::integration
+        I11[...]:::integration
+        I1 ~~~ I2 ~~~ I3 ~~~ I4 ~~~ I5 ~~~ I6 ~~~ I7 ~~~ I8 ~~~ I9 ~~~ I10 ~~~ I11
+    end
+
+    Triggers --> Coordinator
+    Coordinator <--> Context
+    Context <--> Workers
+    Workers --> Integrations
+    Eval -.-> ContextAgent
+
+    classDef trigger fill:#8B5CF6,stroke:#6D28D9,stroke-width:2px,color:#fff
+    classDef evals fill:#F97316,stroke:#C2410C,stroke-width:2px,color:#fff
+    classDef context fill:#EC4899,stroke:#BE185D,stroke-width:2px,color:#fff
+    classDef coordinator fill:#10B981,stroke:#059669,stroke-width:3px,color:#fff
+    classDef worker fill:#06B6D4,stroke:#0891B2,stroke-width:2px,color:#fff
+    classDef integration fill:#F59E0B,stroke:#D97706,stroke-width:2px,color:#fff
+```
+
+## Security
+
+Every customer gets their own isolated Agent Sandbox Environment with:
+
+**Isolated infrastructure:**
+- Dedicated compute resources per customer
+- Isolated file storage - your data never touches other customers
+- Isolated database - complete data separation
+
+**Enterprise security:**
+- AES-256 encryption in transit and at rest
+- SOC 2 Type II certified
+- SSO & SAML support
+- Role-based access control
+
+Your data is never shared with other customers or used for model training.
 
 ## Get started
 
@@ -42,14 +150,6 @@ Discover savings opportunities across your infrastructure and services.
 </Card>
 
 </CardGroup>
-
-## Security
-
-Your data is never shared with other customers or used for model training. Codewolf uses:
-- Isolated agent workspaces
-- AES-256 encryption
-- SSO & SAML support
-- SOC 2 Type II certification
 
 ## Need help?
 
