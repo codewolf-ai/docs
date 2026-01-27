@@ -1,0 +1,213 @@
+---
+title: "AWS"
+description: "Integrate CodeWolf with AWS services for cloud monitoring and analysis"
+---
+
+## Overview
+
+Connect CodeWolf to your AWS infrastructure for comprehensive monitoring across EC2, Lambda, ECS, and other AWS services.
+
+## Prerequisites
+
+- AWS account with appropriate IAM permissions
+- AWS CLI configured
+- CodeWolf account
+
+## Setup
+
+<Steps>
+<Step title="Create IAM role">
+  Create an IAM role for CodeWolf with the necessary permissions.
+
+  ```json
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "cloudwatch:GetMetricData",
+          "cloudwatch:ListMetrics",
+          "ec2:DescribeInstances",
+          "lambda:ListFunctions",
+          "ecs:ListClusters",
+          "logs:FilterLogEvents"
+        ],
+        "Resource": "*"
+      }
+    ]
+  }
+  ```
+</Step>
+
+<Step title="Configure trust relationship">
+  Set up a trust relationship allowing CodeWolf to assume the role.
+
+  ```json
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Principal": {
+          "AWS": "arn:aws:iam::CODEWOLF_ACCOUNT_ID:root"
+        },
+        "Action": "sts:AssumeRole",
+        "Condition": {
+          "StringEquals": {
+            "sts:ExternalId": "YOUR_EXTERNAL_ID"
+          }
+        }
+      }
+    ]
+  }
+  ```
+
+  <Note>
+  Get your External ID from the CodeWolf dashboard under Integrations > AWS.
+  </Note>
+</Step>
+
+<Step title="Connect to CodeWolf">
+  In the [CodeWolf dashboard](https://app.codewolf.ai), go to **Integrations > AWS**.
+
+  Enter your IAM role ARN and click **Connect**.
+</Step>
+</Steps>
+
+## Supported services
+
+### EC2
+Monitor EC2 instances:
+- Instance health and status
+- CPU and memory utilization
+- Network traffic
+- Disk I/O
+
+### Lambda
+Track serverless functions:
+- Invocation count and errors
+- Duration and timeout monitoring
+- Cold start analysis
+- Memory usage optimization
+
+### ECS/Fargate
+Monitor containerized applications:
+- Task and service health
+- Resource utilization
+- Deployment tracking
+- Auto-scaling events
+
+### RDS
+Database monitoring:
+- Query performance
+- Connection pooling
+- Storage utilization
+- Backup status
+
+### CloudWatch integration
+CodeWolf automatically imports:
+- Custom metrics
+- Log groups
+- Alarms and events
+- Dashboards
+
+## Configuration
+
+<ParamField path="region" type="string" default="us-east-1">
+  Primary AWS region for monitoring
+</ParamField>
+
+<ParamField path="multi_region" type="boolean" default="false">
+  Enable monitoring across multiple regions
+</ParamField>
+
+<ParamField path="services" type="array">
+  List of AWS services to monitor: `["ec2", "lambda", "ecs", "rds"]`
+</ParamField>
+
+<ParamField path="polling_interval" type="integer" default="60">
+  Metrics collection interval in seconds
+</ParamField>
+
+## CloudFormation template
+
+Deploy CodeWolf integration using CloudFormation:
+
+<CodeGroup>
+```yaml cloudformation.yaml
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CodeWolf AWS Integration
+
+Parameters:
+  ExternalId:
+    Type: String
+    Description: External ID from CodeWolf dashboard
+
+Resources:
+  CodeWolfRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: CodeWolfIntegrationRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: arn:aws:iam::CODEWOLF_ACCOUNT_ID:root
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                sts:ExternalId: !Ref ExternalId
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/ReadOnlyAccess
+
+Outputs:
+  RoleARN:
+    Description: ARN of the CodeWolf integration role
+    Value: !GetAtt CodeWolfRole.Arn
+```
+</CodeGroup>
+
+Deploy the stack:
+
+```bash
+aws cloudformation create-stack \
+  --stack-name codewolf-integration \
+  --template-body file://cloudformation.yaml \
+  --parameters ParameterKey=ExternalId,ParameterValue=YOUR_EXTERNAL_ID \
+  --capabilities CAPABILITY_NAMED_IAM
+```
+
+## Security best practices
+
+<Warning>
+Follow AWS security best practices when integrating CodeWolf:
+</Warning>
+
+- Use least privilege IAM policies
+- Enable MFA for sensitive operations
+- Regularly rotate access keys
+- Monitor CloudTrail for API activity
+- Use VPC endpoints for private connectivity
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Role assumption failed">
+  - Verify the External ID matches exactly
+  - Check that the trust relationship is configured correctly
+  - Ensure the IAM role has necessary permissions
+  - Confirm the role ARN is correct
+</Accordion>
+
+<Accordion title="Missing metrics">
+  - Verify CloudWatch metrics are being published
+  - Check IAM permissions include `cloudwatch:GetMetricData`
+  - Ensure the correct region is selected
+</Accordion>
+
+<Accordion title="Permission denied errors">
+  Review the IAM policy and add missing permissions. Check CloudTrail logs for specific denied actions.
+</Accordion>
+</AccordionGroup>

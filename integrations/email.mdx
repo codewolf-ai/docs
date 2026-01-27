@@ -1,0 +1,267 @@
+---
+title: "Email"
+description: "Configure email notifications for CodeWolf alerts and reports"
+---
+
+## Overview
+
+Set up email notifications to receive CodeWolf alerts, reports, and summaries directly in your inbox.
+
+## Prerequisites
+
+- Valid email address
+- CodeWolf account
+
+## Setup
+
+<Steps>
+<Step title="Configure email preferences">
+  Go to [CodeWolf dashboard](https://app.codewolf.ai) > **Settings > Notifications > Email**.
+
+  Enter your email address and click **Verify**.
+</Step>
+
+<Step title="Verify email address">
+  Check your inbox for a verification email from CodeWolf.
+
+  Click the verification link to activate email notifications.
+
+  <Note>
+  Check your spam folder if you don't see the verification email within a few minutes.
+  </Note>
+</Step>
+
+<Step title="Customize notification settings">
+  Choose which events trigger email notifications:
+  - Critical alerts
+  - Security vulnerabilities
+  - Daily summaries
+  - Weekly reports
+  - Deployment notifications
+</Step>
+</Steps>
+
+## Notification types
+
+### Real-time alerts
+
+Receive immediate notifications for:
+- **Critical errors**: Production issues requiring immediate attention
+- **Security vulnerabilities**: High and critical severity findings
+- **Deployment failures**: Failed deployments and rollbacks
+- **Performance degradation**: Significant performance drops
+
+<Warning>
+Critical alerts are sent immediately and cannot be batched or delayed.
+</Warning>
+
+### Daily summaries
+
+Get a daily digest of:
+- Code quality changes
+- New pull requests analyzed
+- Security scan results
+- Test coverage updates
+- Top contributors
+
+Configure delivery time:
+```
+Delivery time: 9:00 AM (your timezone)
+```
+
+### Weekly reports
+
+Comprehensive weekly reports include:
+- Code quality trends
+- Security posture overview
+- Deployment frequency
+- Team productivity metrics
+- Recommendations and insights
+
+Delivery schedule:
+```
+Day: Monday
+Time: 9:00 AM (your timezone)
+```
+
+### Custom alerts
+
+Create custom email alerts based on conditions:
+
+<CodeGroup>
+```json Example alert configuration
+{
+  "name": "Quality drop alert",
+  "condition": {
+    "metric": "quality_score",
+    "operator": "less_than",
+    "threshold": 80
+  },
+  "frequency": "immediate",
+  "recipients": ["team@example.com"]
+}
+```
+</CodeGroup>
+
+## Email templates
+
+CodeWolf sends professionally formatted emails:
+
+### Alert email structure
+- **Subject**: Clear, actionable subject line
+- **Summary**: Quick overview of the issue
+- **Details**: Comprehensive information
+- **Action items**: Recommended next steps
+- **Links**: Direct links to dashboard and affected resources
+
+### Report email structure
+- **Header**: Report type and time period
+- **Key metrics**: Visual summary of important data
+- **Trends**: Charts showing changes over time
+- **Insights**: AI-generated observations
+- **Footer**: Links to full dashboard
+
+## Team notifications
+
+Configure team-wide email notifications:
+
+<Tabs>
+<Tab title="Distribution lists">
+  Send notifications to multiple recipients:
+
+  - `team@example.com`: Entire team
+  - `security@example.com`: Security team only
+  - `devops@example.com`: DevOps team
+</Tab>
+
+<Tab title="Role-based">
+  Target notifications by role:
+
+  - Developers: Code quality and PR notifications
+  - Security team: Vulnerability alerts
+  - Managers: Weekly reports and summaries
+  - On-call: Critical production alerts
+</Tab>
+
+<Tab title="Repository-based">
+  Subscribe to specific repositories:
+
+  - Frontend team: `myorg/web-app`
+  - Backend team: `myorg/api-server`
+  - Mobile team: `myorg/mobile-app`
+</Tab>
+</Tabs>
+
+## Email preferences
+
+Customize email behavior:
+
+<ParamField path="frequency" type="string" default="immediate">
+  Notification frequency: `immediate`, `hourly`, `daily`, `weekly`
+</ParamField>
+
+<ParamField path="format" type="string" default="html">
+  Email format: `html`, `plain_text`
+</ParamField>
+
+<ParamField path="batch_alerts" type="boolean" default="false">
+  Batch multiple alerts into single email
+</ParamField>
+
+<ParamField path="include_charts" type="boolean" default="true">
+  Include visual charts in reports
+</ParamField>
+
+<ParamField path="quiet_hours" type="object">
+  Suppress non-critical emails during specified hours
+  ```json
+  {
+    "enabled": true,
+    "start": "22:00",
+    "end": "08:00",
+    "timezone": "America/New_York"
+  }
+  ```
+</ParamField>
+
+## Filtering notifications
+
+Reduce email noise with smart filtering:
+
+### By severity
+Only receive emails for:
+- Critical and high severity issues
+- Medium severity and above
+- All severities
+
+### By repository
+Filter by specific repositories or patterns:
+```
+Include: myorg/production-*
+Exclude: myorg/archive-*
+```
+
+### By event type
+Choose which events trigger emails:
+- ✅ Security vulnerabilities
+- ✅ Deployment failures
+- ✅ Quality drops
+- ❌ Info notifications
+- ❌ Routine scans
+
+## Unsubscribe
+
+Manage email subscriptions:
+
+- **Unsubscribe from specific alerts**: Adjust notification settings
+- **Unsubscribe from all emails**: Click unsubscribe link in any email
+- **Re-subscribe**: Visit notification settings to re-enable
+
+<Note>
+Critical security alerts cannot be fully disabled for account owners.
+</Note>
+
+## Email deliverability
+
+Ensure CodeWolf emails reach your inbox:
+
+### Whitelist sender
+Add these addresses to your allow list:
+- `notifications@codewolf.ai`
+- `alerts@codewolf.ai`
+- `reports@codewolf.ai`
+
+### SPF and DKIM
+CodeWolf emails are authenticated with:
+- SPF records
+- DKIM signatures
+- DMARC policies
+
+### Corporate email filters
+If using corporate email, ask your IT team to whitelist `@codewolf.ai` domain.
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Not receiving emails">
+  - Check spam/junk folder
+  - Verify email address is correct and verified
+  - Review notification preferences are enabled
+  - Check corporate email filters aren't blocking CodeWolf
+  - Confirm alerts are being triggered in the dashboard
+</Accordion>
+
+<Accordion title="Too many emails">
+  - Enable email batching to combine multiple alerts
+  - Adjust severity filters to reduce noise
+  - Set up quiet hours for non-critical notifications
+  - Switch to daily/weekly summaries instead of real-time
+</Accordion>
+
+<Accordion title="Emails going to spam">
+  - Add CodeWolf to your contacts
+  - Mark emails as "Not Spam"
+  - Whitelist `@codewolf.ai` domain
+  - Check with IT about corporate filters
+</Accordion>
+</AccordionGroup>

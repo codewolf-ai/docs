@@ -1,0 +1,71 @@
+---
+title: "Slack"
+description: "Integrate CodeWolf with Slack for real-time notifications and alerts"
+---
+
+## Overview
+
+Connect CodeWolf to your Slack workspace to receive notifications, alerts, and updates directly in your team channels.
+
+## Prerequisites
+
+- Active Slack workspace
+- Admin permissions to install apps
+- CodeWolf account
+
+## Setup
+
+<Steps>
+<Step title="Connect Slack workspace">
+  Navigate to the [CodeWolf dashboard](https://app.codewolf.ai) and go to **Integrations > Slack**.
+
+  Click **Connect to Slack** to authorize the integration.
+</Step>
+
+<Step title="Configure notifications">
+  Select which channels should receive notifications and customize your alert preferences.
+
+  <Tip>
+  Create a dedicated #codewolf channel for all CodeWolf notifications.
+  </Tip>
+</Step>
+
+<Step title="Test the integration">
+  Send a test notification to verify the connection is working properly.
+
+  <Check>
+  You should see a confirmation message in your selected Slack channel.
+  </Check>
+</Step>
+</Steps>
+
+## Available notifications
+
+- Deployment updates
+- Error alerts
+- Security warnings
+- Performance insights
+- Code review notifications
+
+## Configuration options
+
+Customize your Slack integration with these settings:
+
+- **Channel selection**: Choose which channels receive notifications
+- **Alert severity**: Filter by critical, warning, or info levels
+- **Quiet hours**: Set times when notifications are paused
+- **Message format**: Customize notification templates
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Not receiving notifications">
+  - Verify the Slack app is installed in your workspace
+  - Check that CodeWolf has permissions to post in selected channels
+  - Ensure notification filters aren't blocking messages
+</Accordion>
+
+<Accordion title="Reconnecting after token expiration">
+  If your Slack token expires, simply go to Integrations and click **Reconnect** to reauthorize.
+</Accordion>
+</AccordionGroup>

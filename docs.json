@@ -14,35 +14,28 @@
         "tab": "Guides",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "Get started",
             "pages": [
               "index",
               "quickstart",
-              "development"
-            ]
-          },
-          {
-            "group": "Customization",
-            "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
+              {
+                "group": "Integrations",
+                "pages": [
+                  "integrations/slack",
+                  "integrations/github",
+                  "integrations/datadog",
+                  "integrations/sentry",
+                  "integrations/kubernetes",
+                  "integrations/aws",
+                  "integrations/notion",
+                  "integrations/grafana",
+                  "integrations/webhooks",
+                  "integrations/email",
+                  "integrations/codewolf-bridge"
+                ]
+              },
+              "automations",
+              "context"
             ]
           }
         ]
@@ -69,23 +62,12 @@
       }
     ],
     "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
+      "anchors": []
     }
   },
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "light": "/logo/codewolf-black.png",
+    "dark": "/logo/codewolf-white.png"
   },
   "navbar": {
     "links": [
@@ -117,6 +99,11 @@
       "x": "https://x.com/mintlify",
       "github": "https://github.com/mintlify",
       "linkedin": "https://linkedin.com/company/mintlify"
+    }
+  },
+  "seo": {
+    "metatags": {
+      "canonical": "https://docs.codewolf.ai"
     }
   }
 }

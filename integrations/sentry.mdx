@@ -1,0 +1,95 @@
+---
+title: "Sentry"
+description: "Connect CodeWolf to Sentry for enhanced error tracking and monitoring"
+---
+
+## Overview
+
+Integrate CodeWolf with Sentry to correlate code quality insights with error tracking and performance monitoring.
+
+## Prerequisites
+
+- Active Sentry account
+- Sentry project created
+- CodeWolf account
+
+## Setup
+
+<Steps>
+<Step title="Get Sentry DSN">
+  In your Sentry project, go to **Settings > Projects > [Your Project] > Client Keys (DSN)**.
+
+  Copy the DSN URL for use in CodeWolf.
+</Step>
+
+<Step title="Connect to CodeWolf">
+  Navigate to [CodeWolf dashboard](https://app.codewolf.ai) > **Integrations > Sentry**.
+
+  Paste your Sentry DSN and click **Connect**.
+</Step>
+
+<Step title="Configure error tracking">
+  Enable bidirectional sync between CodeWolf and Sentry:
+  - Link Sentry errors to code changes
+  - Correlate deployments with error spikes
+  - Track error resolution progress
+</Step>
+</Steps>
+
+## Features
+
+### Error correlation
+Automatically link Sentry errors to:
+- Recent code commits
+- Pull requests
+- Deployment events
+- Code authors
+
+### Performance insights
+Combine Sentry performance data with CodeWolf analysis:
+- Identify performance bottlenecks
+- Track transaction performance
+- Monitor database query efficiency
+
+### Deployment tracking
+CodeWolf automatically notifies Sentry of deployments for better release tracking.
+
+## Configuration
+
+<ParamField path="environment" type="string" default="production">
+  Specify which environment to track (production, staging, development)
+</ParamField>
+
+<ParamField path="release_tracking" type="boolean" default="true">
+  Enable automatic release tracking for deployments
+</ParamField>
+
+<ParamField path="error_threshold" type="integer" default="10">
+  Number of errors before triggering a CodeWolf alert
+</ParamField>
+
+## Webhooks
+
+CodeWolf can receive Sentry webhooks for:
+- New error events
+- Error frequency alerts
+- Performance degradation
+- Release health issues
+
+Configure webhooks in Sentry: **Settings > Integrations > WebHooks**
+
+Webhook URL: `https://api.codewolf.ai/webhooks/sentry`
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Errors not syncing">
+  - Verify your Sentry DSN is correct
+  - Check that the Sentry project is active
+  - Ensure webhook URLs are configured correctly
+</Accordion>
+
+<Accordion title="Missing deployment data">
+  CodeWolf deployment tracking requires the Sentry SDK to be properly configured with release information in your application.
+</Accordion>
+</AccordionGroup>

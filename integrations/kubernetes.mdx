@@ -1,0 +1,203 @@
+---
+title: "Kubernetes"
+description: "Deploy and monitor CodeWolf in your Kubernetes clusters"
+---
+
+## Overview
+
+Deploy CodeWolf agents in your Kubernetes clusters to monitor applications, collect metrics, and analyze containerized workloads.
+
+## Prerequisites
+
+- Kubernetes cluster (1.19+)
+- kubectl configured with cluster access
+- Helm 3.0+ installed
+- CodeWolf account and API key
+
+## Installation
+
+<Steps>
+<Step title="Add CodeWolf Helm repository">
+  ```bash
+  helm repo add codewolf https://charts.codewolf.ai
+  helm repo update
+  ```
+</Step>
+
+<Step title="Create namespace">
+  ```bash
+  kubectl create namespace codewolf
+  ```
+</Step>
+
+<Step title="Install CodeWolf agent">
+  ```bash
+  helm install codewolf-agent codewolf/codewolf-agent \
+    --namespace codewolf \
+    --set apiKey=YOUR_API_KEY \
+    --set cluster.name=production
+  ```
+
+  <Warning>
+  Replace `YOUR_API_KEY` with your actual CodeWolf API key from the dashboard.
+  </Warning>
+</Step>
+</Steps>
+
+## Configuration
+
+### Basic configuration
+
+<CodeGroup>
+```yaml values.yaml
+apiKey: "your-api-key"
+cluster:
+  name: "production"
+  environment: "prod"
+
+agent:
+  replicas: 3
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+monitoring:
+  enabled: true
+  interval: 60s
+
+logs:
+  enabled: true
+  format: json
+```
+</CodeGroup>
+
+Apply custom configuration:
+
+```bash
+helm upgrade codewolf-agent codewolf/codewolf-agent \
+  --namespace codewolf \
+  -f values.yaml
+```
+
+### Advanced options
+
+<Tabs>
+<Tab title="RBAC Configuration">
+  ```yaml
+  rbac:
+    create: true
+    rules:
+      - apiGroups: [""]
+        resources: ["pods", "services"]
+        verbs: ["get", "list", "watch"]
+  ```
+</Tab>
+
+<Tab title="Network Policies">
+  ```yaml
+  networkPolicy:
+    enabled: true
+    ingress:
+      - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+  ```
+</Tab>
+
+<Tab title="Service Mesh">
+  ```yaml
+  serviceMesh:
+    enabled: true
+    type: istio
+    mtls: true
+  ```
+</Tab>
+</Tabs>
+
+## Monitoring
+
+CodeWolf monitors your Kubernetes cluster for:
+
+- Pod health and status
+- Resource utilization (CPU, memory)
+- Container restarts and crashes
+- Deployment rollout status
+- ConfigMap and Secret changes
+- Network policies and ingress rules
+
+## Deployment strategies
+
+### DaemonSet deployment
+Deploy CodeWolf agent on every node:
+
+```bash
+helm install codewolf-agent codewolf/codewolf-agent \
+  --set deployment.type=daemonset
+```
+
+### Sidecar injection
+Automatically inject CodeWolf sidecar into pods:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    codewolf.ai/inject: "true"
+```
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Agent pods not starting">
+  Check pod logs:
+  ```bash
+  kubectl logs -n codewolf -l app=codewolf-agent
+  ```
+
+  Common issues:
+  - Invalid API key
+  - Insufficient RBAC permissions
+  - Resource constraints
+</Accordion>
+
+<Accordion title="Metrics not appearing">
+  Verify the agent has permissions to access cluster resources:
+  ```bash
+  kubectl auth can-i list pods --as=system:serviceaccount:codewolf:codewolf-agent
+  ```
+</Accordion>
+
+<Accordion title="High resource usage">
+  Reduce monitoring interval or adjust resource limits:
+  ```bash
+  helm upgrade codewolf-agent codewolf/codewolf-agent \
+    --set monitoring.interval=120s \
+    --set agent.resources.limits.memory=256Mi
+  ```
+</Accordion>
+</AccordionGroup>
+
+## Upgrade
+
+Update to the latest version:
+
+```bash
+helm repo update
+helm upgrade codewolf-agent codewolf/codewolf-agent \
+  --namespace codewolf
+```
+
+## Uninstall
+
+Remove CodeWolf from your cluster:
+
+```bash
+helm uninstall codewolf-agent --namespace codewolf
+kubectl delete namespace codewolf
+```

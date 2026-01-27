@@ -1,0 +1,423 @@
+---
+title: "Codewolf Bridge"
+description: "Connect on-premise systems to Codewolf using the secure bridge"
+---
+
+## Overview
+
+Codewolf Bridge enables secure connectivity between your on-premise infrastructure and Codewolf cloud services without exposing internal systems to the internet.
+
+## Prerequisites
+
+- On-premise server or VM (Linux, macOS, or Windows)
+- Docker installed (recommended) or native binary
+- Network access to internal systems
+- Codewolf account and bridge token
+
+## Architecture
+
+Codewolf Bridge creates an encrypted tunnel between your infrastructure and Codewolf:
+
+```
+Internal Systems <--> Codewolf Bridge <--> Codewolf Cloud
+    (Private)           (Outbound only)      (Public)
+```
+
+<Note>
+The bridge only makes outbound connections. No inbound ports need to be opened.
+</Note>
+
+## Installation
+
+<Tabs>
+<Tab title="Docker">
+  <Steps>
+  <Step title="Get bridge token">
+    Generate a bridge token in [Codewolf dashboard](https://app.codewolf.ai) > **Integrations > Bridge**.
+
+    <Warning>
+    Store the token securely. It will only be shown once.
+    </Warning>
+  </Step>
+
+  <Step title="Run bridge container">
+    ```bash
+    docker run -d \
+      --name codewolf-bridge \
+      --restart unless-stopped \
+      -e CODEWOLF_BRIDGE_TOKEN=your_token_here \
+      -e CODEWOLF_BRIDGE_NAME=production-datacenter \
+      codewolf/bridge:latest
+    ```
+  </Step>
+
+  <Step title="Verify connection">
+    Check bridge status:
+    ```bash
+    docker logs codewolf-bridge
+    ```
+
+    <Check>
+    Look for "Bridge connected successfully" in the logs.
+    </Check>
+  </Step>
+  </Steps>
+</Tab>
+
+<Tab title="Binary">
+  <Steps>
+  <Step title="Download bridge">
+    Download the latest bridge binary for your platform:
+
+    ```bash
+    # Linux
+    curl -L https://releases.codewolf.ai/bridge/latest/linux/amd64/codewolf-bridge -o codewolf-bridge
+
+    # macOS
+    curl -L https://releases.codewolf.ai/bridge/latest/darwin/amd64/codewolf-bridge -o codewolf-bridge
+
+    chmod +x codewolf-bridge
+    ```
+  </Step>
+
+  <Step title="Configure bridge">
+    Create configuration file:
+
+    ```yaml config.yaml
+    token: your_token_here
+    name: production-datacenter
+    log_level: info
+    ```
+  </Step>
+
+  <Step title="Run bridge">
+    ```bash
+    ./codewolf-bridge --config config.yaml
+    ```
+
+    For production, use a process manager like systemd:
+
+    ```ini /etc/systemd/system/codewolf-bridge.service
+    [Unit]
+    Description=Codewolf Bridge
+    After=network.target
+
+    [Service]
+    ExecStart=/usr/local/bin/codewolf-bridge --config /etc/codewolf/config.yaml
+    Restart=always
+    User=codewolf
+
+    [Install]
+    WantedBy=multi-user.target
+    ```
+
+    Enable and start:
+    ```bash
+    sudo systemctl enable codewolf-bridge
+    sudo systemctl start codewolf-bridge
+    ```
+  </Step>
+  </Steps>
+</Tab>
+
+<Tab title="Kubernetes">
+  Deploy bridge in your Kubernetes cluster:
+
+  ```yaml deployment.yaml
+  apiVersion: v1
+  kind: Secret
+  metadata:
+    name: codewolf-bridge-token
+  type: Opaque
+  stringData:
+    token: your_token_here
+  ---
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: codewolf-bridge
+  spec:
+    replicas: 2
+    selector:
+      matchLabels:
+        app: codewolf-bridge
+    template:
+      metadata:
+        labels:
+          app: codewolf-bridge
+      spec:
+        containers:
+        - name: bridge
+          image: codewolf/bridge:latest
+          env:
+          - name: CODEWOLF_BRIDGE_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: codewolf-bridge-token
+                key: token
+          - name: CODEWOLF_BRIDGE_NAME
+            value: "kubernetes-cluster"
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+  ```
+
+  Apply configuration:
+  ```bash
+  kubectl apply -f deployment.yaml
+  ```
+</Tab>
+</Tabs>
+
+## Configuration
+
+### Environment variables
+
+<ParamField path="CODEWOLF_BRIDGE_TOKEN" type="string" required>
+  Bridge authentication token from Codewolf dashboard
+</ParamField>
+
+<ParamField path="CODEWOLF_BRIDGE_NAME" type="string" required>
+  Unique name for this bridge instance
+</ParamField>
+
+<ParamField path="CODEWOLF_API_URL" type="string" default="https://api.codewolf.ai">
+  Codewolf API endpoint (usually default)
+</ParamField>
+
+<ParamField path="CODEWOLF_LOG_LEVEL" type="string" default="info">
+  Logging verbosity: `debug`, `info`, `warn`, `error`
+</ParamField>
+
+<ParamField path="CODEWOLF_HEARTBEAT_INTERVAL" type="integer" default="30">
+  Heartbeat interval in seconds
+</ParamField>
+
+### Advanced configuration
+
+```yaml config.yaml
+# Bridge identification
+token: your_token_here
+name: production-datacenter
+
+# Connection settings
+api_url: https://api.codewolf.ai
+heartbeat_interval: 30
+reconnect_delay: 5
+
+# Logging
+log_level: info
+log_format: json
+
+# Resource limits
+max_connections: 10
+max_memory_mb: 512
+
+# Network
+proxy_url: http://proxy.corp.com:8080
+tls_verify: true
+
+# Health check
+health_check_port: 8080
+```
+
+## Features
+
+### Secure tunneling
+- **Encryption**: TLS 1.3 end-to-end encryption
+- **Authentication**: Mutual TLS authentication
+- **Authorization**: Token-based access control
+
+### High availability
+- **Auto-reconnect**: Automatic reconnection on connection loss
+- **Multiple instances**: Run multiple bridges for redundancy
+- **Health checks**: Built-in health monitoring
+
+### Monitoring
+- **Metrics export**: Prometheus-compatible metrics
+- **Logging**: Structured JSON logging
+- **Status API**: Health check endpoint
+
+## Use cases
+
+### Private Git repositories
+Access internal GitLab, GitHub Enterprise, or Bitbucket servers:
+
+```yaml
+sources:
+  - type: git
+    url: https://git.corp.com/org/repo
+    auth:
+      type: token
+      token: ${INTERNAL_GIT_TOKEN}
+```
+
+### Database access
+Query internal databases for code analysis:
+
+```yaml
+databases:
+  - type: postgresql
+    host: db.internal.corp
+    port: 5432
+    database: analytics
+    credentials:
+      username: codewolf
+      password: ${DB_PASSWORD}
+```
+
+### Internal APIs
+Integrate with internal services:
+
+```yaml
+apis:
+  - name: internal-ci
+    url: https://ci.corp.com
+    auth:
+      type: basic
+      username: ${CI_USER}
+      password: ${CI_PASS}
+```
+
+### Container registries
+Access private container registries:
+
+```yaml
+registries:
+  - url: registry.corp.com
+    auth:
+      username: ${REGISTRY_USER}
+      password: ${REGISTRY_PASS}
+```
+
+## Security
+
+### Network security
+- Bridge only makes outbound HTTPS connections
+- No inbound ports required
+- Works behind corporate firewalls
+- Compatible with proxy servers
+
+### Data security
+- End-to-end encryption
+- Zero-knowledge architecture
+- Data stays on-premise when possible
+- Audit logging
+
+### Compliance
+- SOC 2 Type II compliant
+- GDPR compliant
+- HIPAA compatible
+- Supports air-gapped environments
+
+## Monitoring
+
+### Health check endpoint
+
+```bash
+curl http://localhost:8080/health
+```
+
+Response:
+```json
+{
+  "status": "healthy",
+  "version": "1.2.0",
+  "uptime_seconds": 86400,
+  "last_heartbeat": "2026-01-26T17:00:00Z",
+  "connection_status": "connected"
+}
+```
+
+### Metrics
+
+Prometheus metrics available at `/metrics`:
+
+```
+# Bridge status
+codewolf_bridge_connected{name="production-datacenter"} 1
+
+# Request metrics
+codewolf_bridge_requests_total 1234
+codewolf_bridge_request_duration_seconds 0.123
+
+# Connection metrics
+codewolf_bridge_connection_errors_total 2
+codewolf_bridge_reconnections_total 5
+```
+
+### Logs
+
+Structured JSON logs:
+
+```json
+{
+  "timestamp": "2026-01-26T17:00:00Z",
+  "level": "info",
+  "message": "Bridge connected successfully",
+  "bridge_name": "production-datacenter",
+  "version": "1.2.0"
+}
+```
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Bridge won't connect">
+  - Verify token is correct and not expired
+  - Check internet connectivity and firewall rules
+  - Ensure outbound HTTPS (port 443) is allowed
+  - Review logs for specific error messages
+  - Try connecting through a proxy if required
+</Accordion>
+
+<Accordion title="Frequent disconnections">
+  - Check network stability
+  - Verify heartbeat interval isn't too aggressive
+  - Review resource limits (CPU, memory)
+  - Check for rate limiting or firewall timeouts
+  - Consider running multiple bridge instances
+</Accordion>
+
+<Accordion title="High memory usage">
+  - Reduce max_connections setting
+  - Lower max_memory_mb limit
+  - Check for connection leaks in logs
+  - Restart bridge periodically if needed
+  - Monitor with Prometheus metrics
+</Accordion>
+
+<Accordion title="Cannot access internal resources">
+  - Verify bridge has network access to internal systems
+  - Check authentication credentials are correct
+  - Review bridge configuration for resource definitions
+  - Ensure internal systems allow connections from bridge
+  - Check DNS resolution for internal hostnames
+</Accordion>
+</AccordionGroup>
+
+## Updates
+
+Keep Codewolf Bridge up to date:
+
+```bash
+# Docker
+docker pull codewolf/bridge:latest
+docker restart codewolf-bridge
+
+# Binary
+curl -L https://releases.codewolf.ai/bridge/latest/linux/amd64/codewolf-bridge -o codewolf-bridge
+chmod +x codewolf-bridge
+sudo systemctl restart codewolf-bridge
+
+# Kubernetes
+kubectl set image deployment/codewolf-bridge bridge=codewolf/bridge:latest
+```
+
+<Tip>
+Enable automatic updates by subscribing to release notifications in the Codewolf dashboard.
+</Tip>

@@ -1,0 +1,87 @@
+---
+title: "GitHub"
+description: "Connect CodeWolf to your GitHub repositories for automated code analysis"
+---
+
+## Overview
+
+Integrate CodeWolf with GitHub to enable automated code reviews, security scanning, and continuous monitoring of your repositories.
+
+## Prerequisites
+
+- GitHub account with repository access
+- Admin permissions for the repositories you want to monitor
+- CodeWolf account
+
+## Setup
+
+<Steps>
+<Step title="Install GitHub app">
+  Go to the [CodeWolf dashboard](https://app.codewolf.ai) and navigate to **Integrations > GitHub**.
+
+  Click **Install GitHub App** to begin the authorization process.
+</Step>
+
+<Step title="Select repositories">
+  Choose which repositories CodeWolf should monitor:
+  - All repositories (current and future)
+  - Select repositories only
+
+  <Warning>
+  Granting access to all repositories will include private repositories. Review permissions carefully.
+  </Warning>
+</Step>
+
+<Step title="Configure webhooks">
+  CodeWolf will automatically configure webhooks for:
+  - Push events
+  - Pull request events
+  - Issue comments
+
+  <Check>
+  Webhooks are configured automatically. No manual setup required.
+  </Check>
+</Step>
+</Steps>
+
+## Features
+
+### Automated code review
+CodeWolf analyzes every pull request and provides:
+- Code quality feedback
+- Security vulnerability detection
+- Best practice suggestions
+- Performance recommendations
+
+### Commit monitoring
+Track code changes and receive alerts for:
+- Breaking changes
+- Deprecated API usage
+- Security issues
+- Code complexity increases
+
+### Issue integration
+Link CodeWolf insights directly to GitHub issues for seamless workflow integration.
+
+## Configuration
+
+Customize your GitHub integration:
+
+- **Branch protection**: Require CodeWolf checks before merging
+- **Auto-comments**: Enable/disable automatic PR comments
+- **Notification settings**: Choose which events trigger alerts
+- **Custom rules**: Define project-specific analysis rules
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Webhooks not firing">
+  - Verify the GitHub app is installed on the correct organization
+  - Check webhook delivery history in GitHub repository settings
+  - Ensure your repository isn't archived or private with restricted access
+</Accordion>
+
+<Accordion title="Missing repository access">
+  Go to GitHub Settings > Applications > CodeWolf and verify the repository permissions. You may need to grant additional access.
+</Accordion>
+</AccordionGroup>

@@ -1,0 +1,300 @@
+---
+title: "Webhooks"
+description: "Receive real-time CodeWolf events via webhooks"
+---
+
+## Overview
+
+Configure webhooks to receive real-time notifications when events occur in CodeWolf, enabling custom integrations and automated workflows.
+
+## Prerequisites
+
+- HTTPS endpoint to receive webhooks
+- CodeWolf account
+
+## Setup
+
+<Steps>
+<Step title="Create webhook endpoint">
+  Set up an HTTPS endpoint that can receive POST requests from CodeWolf.
+
+  Your endpoint should:
+  - Accept POST requests
+  - Return a 2xx status code
+  - Process requests within 10 seconds
+
+  <Warning>
+  Webhooks must use HTTPS. HTTP endpoints are not supported for security reasons.
+  </Warning>
+</Step>
+
+<Step title="Configure webhook in CodeWolf">
+  Go to [CodeWolf dashboard](https://app.codewolf.ai) > **Integrations > Webhooks**.
+
+  Click **Add Webhook** and enter:
+  - **URL**: Your HTTPS endpoint
+  - **Secret**: A secret key for signature verification
+  - **Events**: Select which events to receive
+</Step>
+
+<Step title="Verify webhook">
+  CodeWolf will send a test payload to verify your endpoint.
+
+  <Check>
+  Respond with a 200 status code to confirm the webhook is working.
+  </Check>
+</Step>
+</Steps>
+
+## Event types
+
+Subscribe to these CodeWolf events:
+
+### Code analysis
+- `code.scan.completed`: Code analysis finished
+- `code.quality.changed`: Quality score changed
+- `code.complexity.increased`: Complexity threshold exceeded
+
+### Security
+- `security.vulnerability.detected`: New vulnerability found
+- `security.scan.completed`: Security scan finished
+- `security.issue.resolved`: Security issue fixed
+
+### Deployments
+- `deployment.started`: Deployment initiated
+- `deployment.completed`: Deployment finished
+- `deployment.failed`: Deployment failed
+
+### Pull requests
+- `pr.opened`: Pull request created
+- `pr.updated`: Pull request updated
+- `pr.merged`: Pull request merged
+- `pr.review.completed`: Code review finished
+
+### Alerts
+- `alert.triggered`: Alert condition met
+- `alert.resolved`: Alert condition resolved
+
+## Payload structure
+
+All webhook payloads follow this structure:
+
+<CodeGroup>
+```json Example payload
+{
+  "event": "security.vulnerability.detected",
+  "timestamp": "2026-01-26T17:00:00Z",
+  "id": "evt_1234567890",
+  "data": {
+    "repository": "myorg/myapp",
+    "branch": "main",
+    "vulnerability": {
+      "id": "CVE-2024-1234",
+      "severity": "high",
+      "title": "SQL Injection vulnerability",
+      "file": "src/database.js",
+      "line": 42,
+      "description": "User input not properly sanitized",
+      "remediation": "Use parameterized queries"
+    }
+  }
+}
+```
+</CodeGroup>
+
+## Signature verification
+
+Verify webhook authenticity using the signature:
+
+<Tabs>
+<Tab title="Node.js">
+```javascript
+const crypto = require('crypto');
+
+function verifyWebhook(payload, signature, secret) {
+  const expectedSignature = crypto
+    .createHmac('sha256', secret)
+    .update(JSON.stringify(payload))
+    .digest('hex');
+
+  return crypto.timingSafeEqual(
+    Buffer.from(signature),
+    Buffer.from(expectedSignature)
+  );
+}
+
+// In your webhook handler
+app.post('/webhooks/codewolf', (req, res) => {
+  const signature = req.headers['x-codewolf-signature'];
+  const isValid = verifyWebhook(req.body, signature, process.env.WEBHOOK_SECRET);
+
+  if (!isValid) {
+    return res.status(401).send('Invalid signature');
+  }
+
+  // Process webhook
+  console.log('Received event:', req.body.event);
+  res.status(200).send('OK');
+});
+```
+</Tab>
+
+<Tab title="Python">
+```python
+import hmac
+import hashlib
+import json
+
+def verify_webhook(payload, signature, secret):
+    expected_signature = hmac.new(
+        secret.encode(),
+        json.dumps(payload).encode(),
+        hashlib.sha256
+    ).hexdigest()
+
+    return hmac.compare_digest(signature, expected_signature)
+
+# In your Flask app
+@app.route('/webhooks/codewolf', methods=['POST'])
+def webhook_handler():
+    signature = request.headers.get('X-CodeWolf-Signature')
+    payload = request.get_json()
+
+    if not verify_webhook(payload, signature, os.environ['WEBHOOK_SECRET']):
+        return 'Invalid signature', 401
+
+    # Process webhook
+    print(f"Received event: {payload['event']}")
+    return 'OK', 200
+```
+</Tab>
+
+<Tab title="Go">
+```go
+package main
+
+import (
+    "crypto/hmac"
+    "crypto/sha256"
+    "encoding/hex"
+    "encoding/json"
+)
+
+func verifyWebhook(payload []byte, signature, secret string) bool {
+    mac := hmac.New(sha256.New, []byte(secret))
+    mac.Write(payload)
+    expectedSignature := hex.EncodeToString(mac.Sum(nil))
+
+    return hmac.Equal([]byte(signature), []byte(expectedSignature))
+}
+
+func webhookHandler(w http.ResponseWriter, r *http.Request) {
+    signature := r.Header.Get("X-CodeWolf-Signature")
+    payload, _ := io.ReadAll(r.Body)
+
+    if !verifyWebhook(payload, signature, os.Getenv("WEBHOOK_SECRET")) {
+        http.Error(w, "Invalid signature", http.StatusUnauthorized)
+        return
+    }
+
+    var event map[string]interface{}
+    json.Unmarshal(payload, &event)
+
+    fmt.Printf("Received event: %s\n", event["event"])
+    w.WriteHeader(http.StatusOK)
+}
+```
+</Tab>
+</Tabs>
+
+## Retry policy
+
+CodeWolf retries failed webhook deliveries:
+
+- **Retry attempts**: Up to 5 retries
+- **Backoff**: Exponential backoff (1s, 2s, 4s, 8s, 16s)
+- **Timeout**: 10 seconds per attempt
+- **Success codes**: 200-299
+
+<Note>
+If all retry attempts fail, the event is marked as failed and logged in your webhook dashboard.
+</Note>
+
+## Filtering events
+
+Filter events by criteria to reduce noise:
+
+```json
+{
+  "url": "https://api.example.com/webhooks",
+  "events": ["security.vulnerability.detected"],
+  "filters": {
+    "severity": ["high", "critical"],
+    "repository": ["myorg/important-app"]
+  }
+}
+```
+
+## Testing webhooks
+
+Test your webhook endpoint with sample payloads:
+
+1. Go to **Integrations > Webhooks**
+2. Select your webhook
+3. Click **Send Test Event**
+4. Choose an event type
+5. View the delivery response
+
+## Monitoring
+
+Track webhook delivery status:
+
+- **Delivery logs**: View all webhook attempts
+- **Success rate**: Percentage of successful deliveries
+- **Response times**: Endpoint latency
+- **Failed deliveries**: Events that need attention
+
+## Best practices
+
+<Check>
+**Do:**
+- Verify webhook signatures
+- Process webhooks asynchronously
+- Return 2xx status codes quickly
+- Log all webhook events
+- Implement idempotency
+- Use HTTPS endpoints
+</Check>
+
+<Warning>
+**Don't:**
+- Perform long-running operations synchronously
+- Expose webhook URLs publicly
+- Ignore signature verification
+- Use HTTP (non-secure) endpoints
+- Block on external API calls
+</Warning>
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Webhooks not being received">
+  - Verify your endpoint is accessible from the internet
+  - Check firewall rules allow incoming HTTPS traffic
+  - Ensure your endpoint returns 2xx status codes
+  - Review webhook logs in CodeWolf dashboard
+</Accordion>
+
+<Accordion title="Signature verification failing">
+  - Confirm you're using the correct secret
+  - Verify payload is not modified before verification
+  - Check that you're using the raw request body
+  - Ensure consistent JSON serialization
+</Accordion>
+
+<Accordion title="Duplicate events">
+  - Implement idempotency using the event ID
+  - Store processed event IDs to prevent duplicates
+  - Use database constraints or caching
+</Accordion>
+</AccordionGroup>

@@ -1,0 +1,381 @@
+---
+title: "Context"
+description: "Provide context to Codewolf for smarter analysis and insights"
+---
+
+## Overview
+
+Context in Codewolf refers to the additional information you provide about your codebase, team, and workflows that enables more accurate analysis, relevant recommendations, and personalized insights.
+
+## Why context matters
+
+Providing context helps Codewolf:
+
+- Understand your specific use cases and requirements
+- Prioritize issues based on business impact
+- Tailor recommendations to your tech stack
+- Recognize patterns unique to your domain
+- Filter noise and focus on what matters
+
+## Types of context
+
+### Business context
+
+Help Codewolf understand what your code does:
+
+<CodeGroup>
+```yaml codewolf.yaml
+business_context:
+  industry: fintech
+  product_type: payment_processing
+  compliance_requirements:
+    - PCI-DSS
+    - SOC2
+    - GDPR
+
+  critical_paths:
+    - payment_processing
+    - user_authentication
+    - fraud_detection
+```
+</CodeGroup>
+
+### Technical context
+
+Define your technical environment:
+
+<CodeGroup>
+```yaml Technical configuration
+technical_context:
+  languages:
+    - python
+    - typescript
+    - go
+
+  frameworks:
+    - django
+    - react
+    - fastapi
+
+  databases:
+    - postgresql
+    - redis
+    - mongodb
+
+  infrastructure:
+    - kubernetes
+    - aws
+    - terraform
+```
+</CodeGroup>
+
+### Team context
+
+Provide information about your team structure:
+
+<CodeGroup>
+```yaml Team structure
+teams:
+  - name: backend
+    members:
+      - john@example.com
+      - jane@example.com
+    focus_areas:
+      - api-server
+      - background-jobs
+
+  - name: frontend
+    members:
+      - alice@example.com
+      - bob@example.com
+    focus_areas:
+      - web-app
+      - mobile-app
+```
+</CodeGroup>
+
+### Workflow context
+
+Describe your development process:
+
+<CodeGroup>
+```yaml Development workflow
+workflow_context:
+  branching_strategy: trunk-based
+
+  environments:
+    - development
+    - staging
+    - production
+
+  deployment_frequency: multiple_per_day
+
+  code_review_required: true
+
+  testing_strategy:
+    - unit_tests
+    - integration_tests
+    - e2e_tests
+```
+</CodeGroup>
+
+## Adding context
+
+### Configuration file
+
+The primary way to add context is through a `codewolf.yaml` file in your repository root:
+
+<Steps>
+<Step title="Create configuration file">
+  ```bash
+  touch codewolf.yaml
+  ```
+</Step>
+
+<Step title="Define your context">
+  ```yaml
+  version: 1.0
+
+  context:
+    business:
+      domain: e-commerce
+      critical_features:
+        - checkout
+        - payment
+        - inventory
+
+    technical:
+      languages: [python, typescript]
+      frameworks: [django, react]
+
+    team:
+      size: 10
+      timezone: America/New_York
+  ```
+</Step>
+
+<Step title="Commit and push">
+  ```bash
+  git add codewolf.yaml
+  git commit -m "Add Codewolf context configuration"
+  git push
+  ```
+
+  <Check>
+  Codewolf will automatically detect and apply the context.
+  </Check>
+</Step>
+</Steps>
+
+### Dashboard configuration
+
+You can also add context through the Codewolf dashboard:
+
+1. Go to [Settings > Context](https://app.codewolf.ai/settings/context)
+2. Fill in the context forms
+3. Save your changes
+
+<Note>
+Configuration file settings take precedence over dashboard settings.
+</Note>
+
+### Code annotations
+
+Add context directly in your code using comments:
+
+```python
+# @codewolf: critical-path
+# @codewolf: compliance=PCI-DSS
+def process_payment(amount, card_number):
+    """Process customer payment."""
+    # Payment processing logic
+    pass
+```
+
+```typescript
+// @codewolf: high-traffic
+// @codewolf: performance-critical
+async function handleCheckout(cartId: string) {
+  // Checkout logic
+}
+```
+
+## Context usage
+
+### Issue prioritization
+
+Context helps Codewolf prioritize issues:
+
+**Without context:**
+- All security issues treated equally
+- No business impact consideration
+- Generic recommendations
+
+**With context:**
+- Critical paths get higher priority
+- Compliance requirements highlighted
+- Industry-specific recommendations
+
+### Custom rules
+
+Define context-aware rules:
+
+<CodeGroup>
+```yaml Custom rules
+rules:
+  - name: payment-validation
+    applies_to:
+      context: critical_paths
+      value: payment_processing
+    checks:
+      - require_unit_tests
+      - require_integration_tests
+      - require_security_review
+
+  - name: performance-monitoring
+    applies_to:
+      context: high_traffic
+    checks:
+      - require_performance_tests
+      - monitor_latency
+      - set_slo_targets
+```
+</CodeGroup>
+
+### Smart notifications
+
+Context enables intelligent alerting:
+
+```yaml
+notifications:
+  critical_path_changes:
+    enabled: true
+    channels:
+      - slack
+      - email
+    recipients:
+      - team: backend
+      - role: tech-lead
+
+  compliance_violations:
+    enabled: true
+    severity: critical
+    channels:
+      - pagerduty
+```
+
+## Best practices
+
+<Check>
+**Provide enough context:**
+- Define critical paths and features
+- Specify compliance requirements
+- Document team ownership
+- Describe workflow processes
+</Check>
+
+<Tip>
+**Keep context updated:**
+- Review context during sprint planning
+- Update when architecture changes
+- Sync with team changes
+- Validate context quarterly
+</Tip>
+
+<Warning>
+**Avoid over-specification:**
+- Don't document every detail
+- Focus on what affects analysis
+- Keep configuration maintainable
+- Use auto-discovery where possible
+</Warning>
+
+## Example configurations
+
+### Startup SaaS
+
+<CodeGroup>
+```yaml Startup configuration
+version: 1.0
+
+context:
+  business:
+    domain: saas
+    stage: early-stage
+    users: 1000
+
+  technical:
+    languages: [typescript, python]
+    frameworks: [nextjs, fastapi]
+    infrastructure: [vercel, aws]
+
+  team:
+    size: 5
+    timezone: America/Los_Angeles
+
+  workflow:
+    deployment_frequency: daily
+    review_required: true
+```
+</CodeGroup>
+
+### Enterprise fintech
+
+<CodeGroup>
+```yaml Enterprise configuration
+version: 1.0
+
+context:
+  business:
+    domain: fintech
+    industry: payment_processing
+    compliance:
+      - PCI-DSS
+      - SOC2
+      - ISO27001
+    critical_paths:
+      - payment_processing
+      - fraud_detection
+      - kyc_verification
+
+  technical:
+    languages: [java, kotlin, go]
+    frameworks: [spring, ktor]
+    databases: [postgresql, cassandra]
+    infrastructure: [kubernetes, aws]
+
+  team:
+    size: 50
+    timezone: UTC
+
+  workflow:
+    branching_strategy: gitflow
+    deployment_frequency: weekly
+    security_review: required
+```
+</CodeGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Context not being applied">
+  - Verify `codewolf.yaml` syntax is valid
+  - Check file is in repository root
+  - Ensure context version is supported
+  - Review Codewolf dashboard for errors
+</Accordion>
+
+<Accordion title="Conflicting context sources">
+  Priority order:
+  1. Code annotations
+  2. Configuration file
+  3. Dashboard settings
+  4. Auto-detected context
+</Accordion>
+
+<Accordion title="Context not affecting analysis">
+  - Context changes may take 5-10 minutes to apply
+  - Trigger a new analysis to see updates
+  - Check that context keys match documentation
+</Accordion>
+</AccordionGroup>

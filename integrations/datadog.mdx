@@ -1,0 +1,100 @@
+---
+title: "Datadog"
+description: "Send CodeWolf metrics and logs to Datadog for comprehensive monitoring"
+---
+
+## Overview
+
+Integrate CodeWolf with Datadog to centralize monitoring, metrics, and logging across your entire infrastructure.
+
+## Prerequisites
+
+- Active Datadog account
+- Datadog API key
+- CodeWolf account
+
+## Setup
+
+<Steps>
+<Step title="Generate Datadog API key">
+  In your Datadog account, navigate to **Organization Settings > API Keys** and create a new API key for CodeWolf.
+
+  <Warning>
+  Keep your API key secure. Never commit it to version control.
+  </Warning>
+</Step>
+
+<Step title="Configure CodeWolf integration">
+  Go to [CodeWolf dashboard](https://app.codewolf.ai) > **Integrations > Datadog**.
+
+  Enter your Datadog API key and select your Datadog site (US1, EU, etc.).
+</Step>
+
+<Step title="Enable metric collection">
+  Choose which CodeWolf metrics to send to Datadog:
+  - Application performance metrics
+  - Error rates
+  - Deployment events
+  - Custom metrics
+</Step>
+</Steps>
+
+## Available metrics
+
+CodeWolf sends the following metrics to Datadog:
+
+- `codewolf.deployments.count`: Number of deployments
+- `codewolf.errors.rate`: Error occurrence rate
+- `codewolf.performance.score`: Performance score (0-100)
+- `codewolf.security.vulnerabilities`: Security issues detected
+- `codewolf.code.quality`: Code quality score
+
+## Dashboards
+
+Create custom Datadog dashboards using CodeWolf metrics:
+
+<CodeGroup>
+```json Example Dashboard Widget
+{
+  "type": "timeseries",
+  "requests": [
+    {
+      "q": "avg:codewolf.performance.score{*}",
+      "display_type": "line"
+    }
+  ],
+  "title": "CodeWolf Performance Score"
+}
+```
+</CodeGroup>
+
+## Log forwarding
+
+Enable log forwarding to send CodeWolf logs to Datadog:
+
+1. Navigate to **Integrations > Datadog > Logs**
+2. Toggle **Enable Log Forwarding**
+3. Configure log filters and tags
+
+## Alerts
+
+Set up Datadog monitors for CodeWolf metrics:
+
+- Alert when error rate exceeds threshold
+- Notify on security vulnerabilities
+- Track deployment frequency
+- Monitor performance degradation
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Metrics not appearing in Datadog">
+  - Verify your API key is correct and active
+  - Check that you selected the correct Datadog site region
+  - Allow up to 5 minutes for initial metrics to appear
+</Accordion>
+
+<Accordion title="Missing metrics">
+  Ensure metric collection is enabled in CodeWolf settings for the specific metrics you want to monitor.
+</Accordion>
+</AccordionGroup>

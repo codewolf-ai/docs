@@ -1,0 +1,486 @@
+---
+title: "Automations"
+description: "Automate your development workflows with Codewolf"
+---
+
+## Overview
+
+Codewolf Automations allow you to create intelligent, event-driven workflows that respond to code changes, quality metrics, and deployment events automatically.
+
+## What are automations?
+
+Automations are rules that trigger actions when specific conditions are met. They help you:
+
+- Enforce code quality standards automatically
+- Notify teams of critical issues instantly
+- Auto-assign reviewers based on code changes
+- Create tickets for technical debt
+- Update documentation automatically
+- Trigger deployments based on quality gates
+
+## Creating automations
+
+<Steps>
+<Step title="Define the trigger">
+  Choose what event should start the automation.
+
+  ```yaml
+  trigger:
+    event: pull_request.opened
+    conditions:
+      - branch: main
+      - files_changed: "src/**"
+  ```
+</Step>
+
+<Step title="Set conditions">
+  Specify when the automation should run.
+
+  ```yaml
+  conditions:
+    - quality_score: < 80
+    - test_coverage: < 90
+    - security_issues: > 0
+  ```
+</Step>
+
+<Step title="Configure actions">
+  Define what should happen when conditions are met.
+
+  ```yaml
+  actions:
+    - type: notify
+      channel: slack
+      message: "Quality gate failed for PR"
+
+    - type: block_merge
+      reason: "Quality score below threshold"
+  ```
+</Step>
+</Steps>
+
+## Automation types
+
+### Quality gates
+
+Enforce quality standards before merging:
+
+<CodeGroup>
+```yaml Quality gate automation
+automations:
+  - name: enforce-quality-standards
+    trigger:
+      event: pull_request.opened
+
+    conditions:
+      quality_score: ">= 80"
+      test_coverage: ">= 85"
+      complexity: "<= 10"
+
+    actions:
+      - type: status_check
+        status: failed
+        message: "Quality standards not met"
+
+      - type: comment
+        template: |
+          Quality gate failed:
+          - Score: {{ quality_score }}
+          - Coverage: {{ test_coverage }}%
+          - Complexity: {{ complexity }}
+```
+</CodeGroup>
+
+### Auto-assignment
+
+Assign reviewers based on expertise:
+
+<CodeGroup>
+```yaml Auto-assignment automation
+automations:
+  - name: auto-assign-reviewers
+    trigger:
+      event: pull_request.opened
+
+    conditions:
+      files_changed:
+        - pattern: "src/payments/**"
+          assign: payments-team
+
+        - pattern: "src/auth/**"
+          assign: security-team
+
+        - pattern: "**/*.sql"
+          assign: database-team
+
+    actions:
+      - type: assign_reviewers
+        based_on_files: true
+```
+</CodeGroup>
+
+### Issue creation
+
+Automatically create issues for technical debt:
+
+<CodeGroup>
+```yaml Issue creation automation
+automations:
+  - name: track-technical-debt
+    trigger:
+      event: code.scan.completed
+
+    conditions:
+      technical_debt_hours: "> 40"
+      complexity_increase: "> 20%"
+
+    actions:
+      - type: create_issue
+        title: "High technical debt detected"
+        labels:
+          - technical-debt
+          - priority-medium
+        body: |
+          Technical debt has increased significantly:
+          - Total hours: {{ technical_debt_hours }}
+          - Complexity increase: {{ complexity_increase }}%
+
+          Affected files:
+          {% for file in affected_files %}
+          - {{ file.path }} ({{ file.debt_hours }}h)
+          {% endfor %}
+```
+</CodeGroup>
+
+### Notifications
+
+Send alerts to the right people:
+
+<CodeGroup>
+```yaml Notification automation
+automations:
+  - name: critical-security-alerts
+    trigger:
+      event: security.vulnerability.detected
+
+    conditions:
+      severity:
+        - critical
+        - high
+
+    actions:
+      - type: notify
+        channels:
+          - slack: "#security-alerts"
+          - email: security@example.com
+          - pagerduty: security-oncall
+
+        message: |
+          🚨 Critical security vulnerability detected
+
+          Severity: {{ severity }}
+          CVE: {{ cve_id }}
+          File: {{ file_path }}:{{ line_number }}
+
+          Action required immediately.
+```
+</CodeGroup>
+
+### Deployment gates
+
+Control when deployments can happen:
+
+<CodeGroup>
+```yaml Deployment gate automation
+automations:
+  - name: production-deployment-gate
+    trigger:
+      event: deployment.requested
+      environment: production
+
+    conditions:
+      quality_score: ">= 90"
+      security_issues: "== 0"
+      test_coverage: ">= 95"
+      all_checks_passed: true
+
+    actions:
+      - type: approve_deployment
+        when: conditions_met
+
+      - type: block_deployment
+        when: conditions_not_met
+        reason: "Quality gates not passed"
+
+      - type: notify
+        channel: slack
+        message: |
+          Production deployment {{ status }}
+          Quality: {{ quality_score }}/100
+```
+</CodeGroup>
+
+## Triggers
+
+Available trigger events:
+
+### Code events
+- `pull_request.opened`
+- `pull_request.updated`
+- `pull_request.merged`
+- `commit.pushed`
+- `branch.created`
+
+### Analysis events
+- `code.scan.completed`
+- `security.scan.completed`
+- `quality_score.changed`
+- `test_coverage.changed`
+
+### Deployment events
+- `deployment.started`
+- `deployment.completed`
+- `deployment.failed`
+
+### Issue events
+- `security.vulnerability.detected`
+- `performance.degraded`
+- `complexity.increased`
+
+## Conditions
+
+Define when automations should run:
+
+### Comparison operators
+```yaml
+conditions:
+  quality_score: ">= 80"      # Greater than or equal
+  test_coverage: "< 90"       # Less than
+  security_issues: "== 0"     # Equal to
+  complexity: "!= 15"         # Not equal to
+  debt_hours: "> 40"          # Greater than
+```
+
+### Pattern matching
+```yaml
+conditions:
+  files_changed:
+    - "src/**/*.py"
+    - "tests/**/*.py"
+
+  branch: "feature/*"
+
+  author: "@backend-team"
+```
+
+### Logical operators
+```yaml
+conditions:
+  all_of:
+    - quality_score: ">= 80"
+    - test_coverage: ">= 85"
+
+  any_of:
+    - severity: critical
+    - affected_users: "> 1000"
+
+  none_of:
+    - branch: main
+    - author: bot
+```
+
+## Actions
+
+Available actions:
+
+### Notifications
+- **Slack**: Send messages to channels
+- **Email**: Send email notifications
+- **PagerDuty**: Create incidents
+- **Webhook**: Call custom endpoints
+
+### GitHub actions
+- **Comment**: Add PR comments
+- **Status check**: Set commit statuses
+- **Assign reviewers**: Auto-assign based on files
+- **Create issue**: Open GitHub issues
+- **Label**: Add/remove labels
+
+### Deployment actions
+- **Approve deployment**: Allow deployment to proceed
+- **Block deployment**: Prevent deployment
+- **Trigger rollback**: Initiate automatic rollback
+
+### Code actions
+- **Create branch**: Create feature branches
+- **Auto-fix**: Apply automatic fixes
+- **Format code**: Run code formatters
+
+## Templates
+
+Use templates for dynamic content:
+
+```yaml
+actions:
+  - type: comment
+    template: |
+      ## Code Quality Report
+
+      **Score:** {{ quality_score }}/100
+      **Coverage:** {{ test_coverage }}%
+      **Issues:** {{ total_issues }}
+
+      ### Top Issues
+      {% for issue in top_issues %}
+      - **{{ issue.severity }}**: {{ issue.title }}
+        File: `{{ issue.file }}:{{ issue.line }}`
+      {% endfor %}
+
+      {% if quality_score < 80 %}
+      ⚠️ Quality score below threshold. Please address the issues above.
+      {% else %}
+      ✅ Quality standards met!
+      {% endif %}
+```
+
+## Scheduling
+
+Run automations on a schedule:
+
+<CodeGroup>
+```yaml Scheduled automation
+automations:
+  - name: weekly-quality-report
+    trigger:
+      schedule: "0 9 * * MON"  # Every Monday at 9am
+
+    actions:
+      - type: generate_report
+        type: quality
+        period: 7d
+
+      - type: notify
+        channel: slack
+        message: "Weekly quality report available"
+```
+</CodeGroup>
+
+## Best practices
+
+<Check>
+**Design effective automations:**
+- Start simple, iterate based on feedback
+- Test automations in staging first
+- Use clear, descriptive names
+- Document automation purpose
+- Monitor automation performance
+</Check>
+
+<Tip>
+**Avoid automation fatigue:**
+- Don't over-notify teams
+- Use appropriate severity levels
+- Batch non-urgent notifications
+- Provide actionable information
+- Allow users to customize preferences
+</Tip>
+
+<Warning>
+**Be cautious with:**
+- Auto-merging pull requests
+- Automatic production deployments
+- Blocking all PRs by default
+- Excessive notifications
+- Complex condition logic
+</Warning>
+
+## Examples
+
+### Complete PR workflow
+
+<CodeGroup>
+```yaml Complete PR automation
+automations:
+  # Auto-assign reviewers
+  - name: assign-reviewers
+    trigger:
+      event: pull_request.opened
+    actions:
+      - type: assign_reviewers
+        based_on_files: true
+        minimum: 2
+
+  # Quality check
+  - name: quality-gate
+    trigger:
+      event: pull_request.opened
+    conditions:
+      quality_score: ">= 80"
+      test_coverage: ">= 85"
+    actions:
+      - type: status_check
+        status: "{{ 'passed' if conditions_met else 'failed' }}"
+
+  # Security check
+  - name: security-scan
+    trigger:
+      event: pull_request.opened
+    conditions:
+      security_issues:
+        critical: "== 0"
+        high: "== 0"
+    actions:
+      - type: block_merge
+        when: conditions_not_met
+      - type: notify
+        when: conditions_not_met
+        channel: slack
+        message: "Security issues found in PR"
+
+  # Auto-approve safe changes
+  - name: auto-approve-docs
+    trigger:
+      event: pull_request.opened
+    conditions:
+      files_changed: "docs/**/*.md"
+      author: "@docs-team"
+    actions:
+      - type: approve_pr
+      - type: label
+        labels: [documentation, auto-approved]
+```
+</CodeGroup>
+
+## Monitoring automations
+
+Track automation performance in the dashboard:
+
+- **Execution history**: See when automations ran
+- **Success rate**: Track automation reliability
+- **Impact metrics**: Measure effectiveness
+- **Error logs**: Debug failed automations
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Automation not triggering">
+  - Verify trigger event matches expected event
+  - Check conditions are being met
+  - Review automation is enabled
+  - Check for conflicting automations
+</Accordion>
+
+<Accordion title="Incorrect conditions evaluation">
+  - Validate condition syntax
+  - Check operator precedence
+  - Test with known values
+  - Review template variable names
+</Accordion>
+
+<Accordion title="Actions not executing">
+  - Verify integration permissions
+  - Check action configuration
+  - Review error logs in dashboard
+  - Test actions individually
+</Accordion>
+</AccordionGroup>

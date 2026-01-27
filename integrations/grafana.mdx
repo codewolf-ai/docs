@@ -1,0 +1,226 @@
+---
+title: "Grafana"
+description: "Visualize CodeWolf metrics in Grafana dashboards"
+---
+
+## Overview
+
+Connect CodeWolf to Grafana to create custom dashboards and visualizations for your code quality, performance, and security metrics.
+
+## Prerequisites
+
+- Grafana instance (8.0+)
+- Admin access to Grafana
+- CodeWolf account and API key
+
+## Setup
+
+<Steps>
+<Step title="Install CodeWolf data source plugin">
+  In Grafana, navigate to **Configuration > Data sources > Add data source**.
+
+  Search for "CodeWolf" and click **Install**.
+
+  <Note>
+  If the plugin isn't available in the marketplace, you can install it manually from the [CodeWolf GitHub repository](https://github.com/codewolf-ai/grafana-datasource).
+  </Note>
+</Step>
+
+<Step title="Configure data source">
+  After installation, configure the CodeWolf data source:
+
+  - **Name**: CodeWolf
+  - **URL**: `https://api.codewolf.ai`
+  - **API Key**: Your CodeWolf API key from the dashboard
+
+  Click **Save & Test** to verify the connection.
+</Step>
+
+<Step title="Import dashboards">
+  Import pre-built CodeWolf dashboards:
+
+  Go to **Dashboards > Import** and use these dashboard IDs:
+  - **15001**: Code Quality Overview
+  - **15002**: Security Metrics
+  - **15003**: Performance Monitoring
+  - **15004**: Deployment Tracking
+</Step>
+</Steps>
+
+## Available metrics
+
+Query these CodeWolf metrics in Grafana:
+
+### Code quality
+- `codewolf_quality_score`: Overall code quality score (0-100)
+- `codewolf_complexity`: Cyclomatic complexity
+- `codewolf_duplication`: Code duplication percentage
+- `codewolf_coverage`: Test coverage percentage
+
+### Security
+- `codewolf_vulnerabilities_total`: Total security vulnerabilities
+- `codewolf_vulnerabilities_by_severity`: Vulnerabilities grouped by severity
+- `codewolf_security_score`: Security posture score
+
+### Performance
+- `codewolf_build_duration`: Build time in seconds
+- `codewolf_test_duration`: Test execution time
+- `codewolf_deployment_frequency`: Deployments per day
+
+### Activity
+- `codewolf_commits_total`: Total commits
+- `codewolf_pull_requests`: Pull request count
+- `codewolf_contributors`: Active contributors
+
+## Dashboard examples
+
+### Code quality dashboard
+
+<CodeGroup>
+```json Query example
+{
+  "datasource": "CodeWolf",
+  "metric": "codewolf_quality_score",
+  "timeRange": "7d",
+  "aggregation": "avg",
+  "groupBy": ["repository"]
+}
+```
+</CodeGroup>
+
+Create panels for:
+- Quality score trend over time
+- Repository comparison
+- Top issues by category
+- Coverage vs. complexity scatter plot
+
+### Security dashboard
+
+Monitor security metrics:
+- Vulnerability severity breakdown (pie chart)
+- New vulnerabilities over time (time series)
+- Mean time to remediation (stat panel)
+- Security score by project (bar chart)
+
+### Performance dashboard
+
+Track development velocity:
+- Build duration trend
+- Test execution time
+- Deployment frequency
+- CI/CD pipeline success rate
+
+## Query editor
+
+Use the CodeWolf query editor in Grafana:
+
+<Tabs>
+<Tab title="Metrics">
+  Select from available metrics, apply filters, and choose aggregation methods.
+
+  ```
+  Metric: codewolf_quality_score
+  Filter: repository = "main-app"
+  Aggregation: avg
+  Group by: branch
+  ```
+</Tab>
+
+<Tab title="Logs">
+  Query CodeWolf logs and events:
+
+  ```
+  Type: security_scan
+  Severity: high, critical
+  Time range: Last 24h
+  ```
+</Tab>
+
+<Tab title="Alerts">
+  Query alert history and status:
+
+  ```
+  Status: firing
+  Category: performance
+  Repository: *
+  ```
+</Tab>
+</Tabs>
+
+## Alerting
+
+Create Grafana alerts based on CodeWolf metrics:
+
+<Steps>
+<Step title="Define alert rule">
+  ```
+  IF avg(codewolf_quality_score) < 70
+  FOR 1h
+  LABELS severity=warning
+  ```
+</Step>
+
+<Step title="Configure notification channel">
+  Send alerts to Slack, email, PagerDuty, or other channels.
+</Step>
+
+<Step title="Set alert message">
+  ```
+  Code quality has dropped below 70 for {{ $labels.repository }}
+  Current value: {{ $value }}
+  ```
+</Step>
+</Steps>
+
+## Variables
+
+Use dashboard variables for dynamic filtering:
+
+- `$repository`: Filter by repository
+- `$branch`: Filter by branch
+- `$environment`: Filter by environment
+- `$time_range`: Dynamic time range selection
+
+## Annotations
+
+Display CodeWolf events as Grafana annotations:
+
+- Deployment markers
+- Release tags
+- Security scan completions
+- Critical alerts
+
+Enable annotations in dashboard settings:
+
+```json
+{
+  "datasource": "CodeWolf",
+  "type": "events",
+  "tags": ["deployment", "release"]
+}
+```
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Data source connection failed">
+  - Verify your API key is correct and active
+  - Check that Grafana can reach `https://api.codewolf.ai`
+  - Ensure firewall rules allow outbound HTTPS traffic
+  - Confirm your CodeWolf account has API access enabled
+</Accordion>
+
+<Accordion title="No data in panels">
+  - Check the time range includes data points
+  - Verify metric names are spelled correctly
+  - Ensure filters aren't excluding all data
+  - Confirm your account has access to the selected repositories
+</Accordion>
+
+<Accordion title="Slow query performance">
+  - Reduce the time range for queries
+  - Use aggregation to limit data points
+  - Enable query caching in data source settings
+  - Consider downsampling high-frequency metrics
+</Accordion>
+</AccordionGroup>

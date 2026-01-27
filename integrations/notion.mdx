@@ -1,0 +1,155 @@
+---
+title: "Notion"
+description: "Sync CodeWolf insights and documentation to Notion workspaces"
+---
+
+## Overview
+
+Integrate CodeWolf with Notion to automatically sync code documentation, insights, and reports to your team's workspace.
+
+## Prerequisites
+
+- Notion workspace (admin access recommended)
+- CodeWolf account
+
+## Setup
+
+<Steps>
+<Step title="Create Notion integration">
+  Go to [Notion Integrations](https://www.notion.so/my-integrations) and create a new internal integration.
+
+  Give it a name (e.g., "CodeWolf") and select the workspace to connect.
+</Step>
+
+<Step title="Copy integration token">
+  After creating the integration, copy the **Internal Integration Token**.
+
+  <Warning>
+  Keep this token secure. It provides access to your Notion workspace.
+  </Warning>
+</Step>
+
+<Step title="Share pages with integration">
+  In Notion, open the pages or databases you want CodeWolf to access.
+
+  Click **Share** and invite your CodeWolf integration.
+</Step>
+
+<Step title="Connect to CodeWolf">
+  In [CodeWolf dashboard](https://app.codewolf.ai), navigate to **Integrations > Notion**.
+
+  Paste your integration token and select which content to sync.
+</Step>
+</Steps>
+
+## Sync options
+
+Choose what CodeWolf syncs to Notion:
+
+### Documentation
+- API documentation
+- Code comments and docstrings
+- README files
+- Architecture diagrams
+
+### Insights
+- Code quality reports
+- Security vulnerability summaries
+- Performance analysis
+- Technical debt tracking
+
+### Activity
+- Recent commits and changes
+- Pull request summaries
+- Deployment logs
+- Error reports
+
+## Database templates
+
+CodeWolf can create structured databases in Notion:
+
+<Tabs>
+<Tab title="Code Quality">
+  A database tracking code quality metrics over time with properties for score, date, repository, and trends.
+</Tab>
+
+<Tab title="Security Issues">
+  Track security vulnerabilities with severity, status, affected files, and resolution notes.
+</Tab>
+
+<Tab title="Technical Debt">
+  Monitor technical debt items with priority, effort estimates, and owner assignments.
+</Tab>
+
+<Tab title="Deployments">
+  Log deployment history with timestamps, environments, versions, and status.
+</Tab>
+</Tabs>
+
+## Automation
+
+Set up automatic syncing rules:
+
+- **Daily reports**: Send code quality summaries every morning
+- **Real-time alerts**: Instant notifications for critical issues
+- **Weekly digests**: Comprehensive weekly activity reports
+- **Custom triggers**: Sync based on specific events or thresholds
+
+## Page structure
+
+CodeWolf creates organized Notion pages with:
+
+```
+📁 CodeWolf Dashboard
+├── 📊 Overview
+├── 📈 Metrics
+│   ├── Code Quality
+│   ├── Performance
+│   └── Security
+├── 🔍 Insights
+│   ├── Recent Changes
+│   ├── Top Issues
+│   └── Recommendations
+└── 📚 Documentation
+    ├── API Reference
+    └── Architecture
+```
+
+## Customization
+
+Customize how CodeWolf formats content in Notion:
+
+<ParamField path="page_icon" type="string" default="🐺">
+  Icon for CodeWolf pages
+</ParamField>
+
+<ParamField path="color_scheme" type="string" default="default">
+  Color theme: `default`, `gray`, `brown`, `orange`, `yellow`, `green`, `blue`, `purple`, `pink`, `red`
+</ParamField>
+
+<ParamField path="include_charts" type="boolean" default="true">
+  Include visual charts and graphs
+</ParamField>
+
+<ParamField path="mention_users" type="boolean" default="false">
+  Automatically @mention relevant team members
+</ParamField>
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Integration can't access pages">
+  Make sure you've shared the specific pages or databases with your CodeWolf integration. Click **Share** on each page and add the integration.
+</Accordion>
+
+<Accordion title="Sync not working">
+  - Verify your integration token is valid
+  - Check that the integration hasn't been revoked
+  - Ensure you have proper permissions in Notion
+  - Review sync settings in CodeWolf dashboard
+</Accordion>
+
+<Accordion title="Duplicate pages being created">
+  CodeWolf uses page IDs to track synced content. If pages are deleted manually in Notion, CodeWolf may recreate them. Use the archive feature instead.
+</Accordion>
+</AccordionGroup>
