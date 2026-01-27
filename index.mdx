@@ -64,7 +64,7 @@ Continuously improve your infrastructure. AI agents analyze costs, identify reso
 - Daily 9am report: Query optimization opportunities in payment service
 </Tab>
 
-<Tab title="Learn">
+<Tab title="Understand">
 Codewolf AI agents understand your entire system. Not just your codebase, but production behavior, infrastructure, service dependencies, deployment patterns, and system relationships. This deep context enables smarter investigations, better fixes, and proactive prevention.
 
 **Slack mentions:**
@@ -115,6 +115,10 @@ Codewolf connects to your systems and continuously learns, then deploys speciali
   Each integration is configured with specific agent skills and capabilities. Rate limit handling ensures reliable operation across all connected tools without hitting API limits.
 </Step>
 </Steps>
+
+## Architecture
+
+Codewolf maintains continuously updated production context and orchestrates AI agents based on real-time triggers and system state. It ingests signals from code, infrastructure, telemetry, and historical events, and processes triggers from Slack, alerts, cron jobs, GitHub events, and webhooks. A central coordinator dynamically manages an agent pool to handle concurrent production tasks safely. Integrations are skill-aware with built-in rate limiting and retries, while agents evaluate their actions and outcomes, feeding results back into context to refine future decisions and integration behavior as systems evolve.
 
 ```mermaid
 graph LR
@@ -170,7 +174,9 @@ graph LR
 
     Triggers --> Coordinator
     Coordinator <--> Context
+    Coordinator -.-> Workers
     Context <--> Workers
+    Coordinator -.-> Workers
     Workers --> Integrations
     Eval -.-> ContextAgent
 
