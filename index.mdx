@@ -127,7 +127,10 @@ graph LR
 
     subgraph Sandbox["Private Agent Sandbox"]
         subgraph Coordinator["Coordinator"]
-            CoordinatorAgent[Coordinator Agent]:::coordinator
+            C1[Coordinator 1]:::coordinator
+            C2[Coordinator 2]:::coordinator
+            C3[Coordinator 3]:::coordinator
+            C1 ~~~ C2 ~~~ C3
         end
 
         subgraph Context["Context"]
