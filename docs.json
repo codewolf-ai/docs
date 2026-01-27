@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "Codewolf",
   "colors": {
     "primary": "#16A34A",
     "light": "#07C983",
@@ -103,7 +103,13 @@
   },
   "seo": {
     "metatags": {
-      "canonical": "https://docs.codewolf.ai"
+      "canonical": "https://docs.codewolf.ai",
+      "og:site_name": "Codewolf",
+      "og:title": "Codewolf Documentation",
+      "og:description": "AI agents that work while you sleep, running real engineering operations in Slack",
+      "twitter:card": "summary_large_image",
+      "twitter:title": "Codewolf Documentation",
+      "twitter:description": "AI agents that work while you sleep, running real engineering operations in Slack"
     }
   }
 }
