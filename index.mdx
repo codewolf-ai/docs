@@ -118,7 +118,7 @@ Codewolf connects to your systems and continuously learns, then deploys speciali
 
 ## Architecture
 
-Codewolf maintains continuously updated production context and orchestrates AI agents based on real-time triggers and system state. It ingests signals from code, infrastructure, telemetry, and historical events, and processes triggers from Slack, alerts, cron jobs, GitHub events, and webhooks. A central coordinator dynamically manages an agent pool to handle concurrent production tasks safely. Integrations are skill-aware with built-in rate limiting and retries, while agents evaluate their actions and outcomes, feeding results back into context to refine future decisions and integration behavior as systems evolve.
+Codewolf maintains continuously updated production context and orchestrates AI agents based on real-time triggers and system state. It pulls real-time data from code, infrastructure, and telemetry (logs, traces, metrics), and responds to events from Slack, alerts, cron jobs, GitHub, and webhooks. A central coordinator dynamically manages an agent pool to handle concurrent production tasks safely. Integrations are skill-aware with built-in rate limiting and retries, while agents evaluate their actions and outcomes, feeding results back into context to refine future decisions and integration behavior as systems evolve.
 
 ```mermaid
 graph LR
