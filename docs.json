@@ -17,25 +17,7 @@
             "group": "Get started",
             "pages": [
               "index",
-              "quickstart",
-              {
-                "group": "Integrations",
-                "pages": [
-                  "integrations/slack",
-                  "integrations/github",
-                  "integrations/datadog",
-                  "integrations/sentry",
-                  "integrations/kubernetes",
-                  "integrations/aws",
-                  "integrations/notion",
-                  "integrations/grafana",
-                  "integrations/webhooks",
-                  "integrations/email",
-                  "integrations/codewolf-bridge"
-                ]
-              },
-              "automations",
-              "context"
+              "quickstart"
             ]
           }
         ]
