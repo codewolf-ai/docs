@@ -1,9 +1,9 @@
 ---
 title: "About Codewolf AI"
 description: |
-  Codewolf is a system of autonomous AI agents that run day-to-day production engineering work directly from Slack. As teams ship continuously, production work often still depends on humans reacting to alerts, digging through dashboards, and coordinating fixes by hand. Codewolf acts as an always-on production teammate that removes this operational burden.
+  Codewolf is a system of autonomous AI agents that handle day-to-day production work directly from Slack.
 
-  The agents continuously observe your systems, maintain deep operational context, and take action when needed: investigating incidents, applying fixes through pull requests and configuration changes, detecting issues early, and surfacing clear reports. Codewolf doesn't replace engineers. It reduces operational noise, allowing humans to focus on design, architecture, and building products while production work progresses automatically with full visibility and control.
+  The agents continuously observe your systems, maintain operational context, and take action when needed — investigating incidents, applying fixes through pull requests and configuration changes, detecting issues early, and surfacing clear reports. Codewolf reduces operational noise so engineers can focus on design, architecture, and building products, while production work progresses automatically with full visibility and control.
 ---
 
 ## Key features
@@ -96,29 +96,27 @@ Codewolf AI agents understand your entire system. Not just your codebase, but pr
 
 ## How Codewolf agents work
 
-Codewolf connects to your systems and continuously learns, then deploys specialized AI agents to handle engineering tasks autonomously.
+Codewolf connects to your systems, continuously builds operational context, and deploys specialized AI agents to handle engineering tasks autonomously.
 
 <Steps>
-<Step title="Generate context and update">
-  Continuously evaluate and update agent context from your codebase, infrastructure, telemetry, and historical data. Context stays fresh as your systems evolve.
+<Step title="Context generation">
+  Agents continuously ingest and update context from your codebase, infrastructure, telemetry, and historical events. Context evolves as your systems change, ensuring decisions are always based on current state.
 </Step>
 
-<Step title="Triggers">
-  Process events from multiple sources - Slack mentions, alerts, cron jobs, GitHub events, and webhooks. Each trigger type is handled with appropriate priority and routing.
+<Step title="Triggers and events">
+  Codewolf processes events from multiple sources including Slack mentions, alerts, cron jobs, GitHub events, and webhooks. Triggers are normalized, prioritized, and routed appropriately.
 </Step>
 
-<Step title="Coordinator and worker agents on demand">
-  Spin up worker agents dynamically based on task complexity. The coordinator delegates work across multiple specialized agents running in parallel.
+<Step title="Agent orchestration">
+  A central coordinator dynamically spins up worker agents based on task type and complexity. Specialized agents run in parallel to investigate issues, generate fixes, or perform analysis.
 </Step>
 
-<Step title="Integrations tailored with right agent skills">
-  Each integration is configured with specific agent skills and capabilities. Rate limit handling ensures reliable operation across all connected tools without hitting API limits.
+<Step title="Skill-aware integrations">
+  Each integration is configured with specific agent capabilities. Built-in rate limiting, retries, and backoff ensure reliable operation across all connected systems.
 </Step>
 </Steps>
 
 ## Architecture
-
-Codewolf maintains continuously updated production context and orchestrates AI agents based on real-time triggers and system state. It pulls real-time data from code, infrastructure, and telemetry (logs, traces, metrics), and responds to events from Slack, alerts, cron jobs, GitHub, and webhooks. A central coordinator dynamically manages an agent pool to handle concurrent production tasks safely. Integrations are skill-aware with built-in rate limiting and retries, while agents evaluate their actions and outcomes, feeding results back into context to refine future decisions and integration behavior as systems evolve.
 
 ```mermaid
 graph LR
