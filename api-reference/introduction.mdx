@@ -1,33 +1,61 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: 'API Reference'
+description: 'Send signals to Codewolf from your CI/CD pipelines and infrastructure'
 ---
 
-<Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
-</Note>
+## Signals API
 
-## Welcome
+Send service deployments, alerts, and custom events to help Codewolf correlate issues across your stack.
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+### Base URL
 
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
+```
+https://signals.codewolf.app/{signalKey}
+```
 
-## Authentication
+### Authentication
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+All API requests require Bearer token authentication:
 
-```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+```bash
+Authorization: Bearer YOUR_API_KEY
+```
+
+You can find your signal key and API key in the [Codewolf dashboard](https://app.codewolf.ai).
+
+## Event Types
+
+Send deployment events, alerts, and change notifications from:
+
+- GitHub Actions
+- Jenkins
+- ArgoCD
+- GitLab CI
+- CircleCI
+- Any CI/CD or deployment tool
+
+## Example: Deployment Event
+
+Send a deployment event from GitHub Actions:
+
+```bash
+curl -X POST https://signals.codewolf.app/{signalKey} \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "deployment",
+    "repository": "${{ github.repository }}",
+    "service": "api-service",
+    "version": "${{ github.sha }}",
+    "sha": "${{ github.sha }}",
+    "environment": "production",
+    "triggeredBy": "${{ github.actor }}",
+    "status": "success",
+    "timestamp": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'",
+    "metadata": {
+      "workflow": "${{ github.workflow }}",
+      "runId": "${{ github.run_id }}",
+      "runNumber": "${{ github.run_number }}"
+    }
+  }'
 ```
